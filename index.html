@@ -69,7 +69,6 @@
       v: { min: 0.05, max: 4.00, step: 0.05, default: 1.20, label: "Vertical Stick Sens (0.05 - 4.00)" },
       zoom: { min: 0.05, max: 4.00, step: 0.05, default: 1.00, label: "ADS Sens Multiplier (0.05 - 4.00)" },
       curves: ["Standard", "Linear", "Dynamic"],
-      // Scaling baseline factor (1.20 CoD = 200 THE FINALS)
       scaleFactor: 166.6667
     },
     finals: {
@@ -138,11 +137,11 @@
     renderCardUI('B');
   }
 
-  // Helper function to step-align rounding
+  // Fixed clamping helper: rounds to nearest step FIRST, then clamps within boundaries
   function clampStep(val, min, max, step) {
-    let clamped = Math.max(min, Math.min(max, val));
-    let stepped = Math.round(clamped / step) * step;
-    return parseFloat(stepped.toFixed(2));
+    let stepped = Math.round(val / step) * step;
+    let clamped = Math.max(min, Math.min(max, stepped));
+    return parseFloat(clamped.toFixed(2));
   }
 
   // Conversion Engine
@@ -162,7 +161,6 @@
     const tgtG = GAME_DATA[tgtKey];
 
     if (srcKey === tgtKey) {
-      // Direct 1:1 copy if same game is selected on both sides
       document.getElementById(`h_${tgtSide}`).value = srcH;
       document.getElementById(`v_${tgtSide}`).value = srcV;
       document.getElementById(`zoom_${tgtSide}`).value = srcZoom;
@@ -208,7 +206,7 @@
     if (codCurve === "Dynamic" || finalsCurve === "Sinusoidal") {
       recList.innerHTML = `
         <li><strong>Dynamic <-> Sinusoidal:</strong> Both curves utilize S-curve acceleration. This is the closest native response match between CoD and THE FINALS.</li>
-        <li>Set <strong>Horizontal & Vertical Look Boost</strong> to <strong>0</strong> and <strong>Look Acceleration</strong> to <strong>0%</strong> in THE FINALS for exact curve tracking.</li>
+        <li>Set <strong>Horizontal & Vertical Look Boost</strong> to <strong>0</strong> and 0% Acceleration in THE FINALS for 1:1 tracking.</li>
       `;
     } else if (codCurve === "Linear" || finalsCurve === "Linear") {
       recList.innerHTML = `
