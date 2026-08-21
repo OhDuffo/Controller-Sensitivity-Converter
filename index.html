@@ -3,157 +3,172 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controller Sensitivity Matcher</title>
+  <title>CoD <-> THE FINALS Controller Converter</title>
   <style>
     * { box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 2rem; display: flex; justify-content: center; }
-    .container { max-width: 650px; width: 100%; background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .container { max-width: 800px; width: 100%; background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     h1 { margin-top: 0; font-size: 1.6rem; text-align: center; color: #38bdf8; }
-    .section-title { font-size: 1.1rem; font-weight: 600; color: #cbd5e1; margin-bottom: 0.75rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+    .card { background: #334155; padding: 1.25rem; border-radius: 8px; }
+    .card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #475569; display: flex; justify-content: space-between; }
+    .title-cod { color: #a3e635; }
+    .title-finals { color: #f43f5e; }
     
-    /* Benchmark Card */
-    .card { background: #334155; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; }
-    .status { font-weight: bold; color: #38bdf8; font-size: 1.1rem; }
-    .timer { font-size: 2.2rem; margin: 0.5rem 0; font-family: monospace; font-weight: bold; color: #facc15; }
-    .stats { display: flex; justify-content: space-around; background: #1e293b; padding: 0.75rem; border-radius: 6px; margin-top: 0.75rem; font-size: 0.9rem; }
-    .stat-box { display: flex; flex-direction: column; }
-    .stat-val { font-weight: bold; color: #38bdf8; font-size: 1.1rem; }
+    .field { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: #cbd5e1; }
+    input, select { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 0.95rem; }
     
-    /* Converter Inputs */
-    .inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
-    label { display: block; font-size: 0.875rem; margin-bottom: 0.25rem; color: #94a3b8; }
-    input, select { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 1rem; }
-    .result-box { background: #0284c7; padding: 1.25rem; border-radius: 8px; text-align: center; margin-top: 1.25rem; }
-    .result-val { font-size: 1.4rem; font-weight: bold; margin-top: 0.25rem; }
-    
-    .btn-reset { background: #475569; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 0.75rem; font-size: 0.8rem; }
-    .btn-reset:hover { background: #64748b; }
+    .recommendation-box { background: #0284c7; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; }
+    .rec-title { font-size: 0.85rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em; opacity: 0.9; }
+    .rec-list { margin: 0.5rem 0 0 0; padding-left: 1.2rem; font-size: 0.9rem; line-height: 1.4; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Controller Sensitivity Matcher</h1>
+  <h1>Controller Sensitivity Converter</h1>
+  <p style="text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: -0.5rem;">
+    Bidirectional translation for Call of Duty and THE FINALS
+  </p>
 
-  <!-- Direct Conversion Engine -->
-  <div style="margin-bottom: 2rem;">
-    <div class="section-title">Direct Ratio Converter</div>
-    <div class="inputs">
-      <div>
-        <label for="codSens">Call of Duty (1 - 20):</label>
-        <input type="number" id="codSens" value="6" min="1" max="20" step="0.5" oninput="convertFromCod()">
+  <div class="grid">
+    <!-- Call of Duty Column -->
+    <div class="card">
+      <div class="card-title title-cod">Call of Duty</div>
+      
+      <div class="field">
+        <label for="codH">Horizontal Stick Sensitivity (1.0 - 20.0)</label>
+        <input type="number" id="codH" value="6.0" min="1" max="20" step="0.1" oninput="fromCod()">
       </div>
-      <div>
-        <label for="finalsSens">THE FINALS (1 - 100):</label>
-        <input type="number" id="finalsSens" value="30" min="1" max="100" step="1" oninput="convertFromFinals()">
+      
+      <div class="field">
+        <label for="codV">Vertical Stick Sensitivity (1.0 - 20.0)</label>
+        <input type="number" id="codV" value="6.0" min="1" max="20" step="0.1" oninput="fromCod()">
+      </div>
+
+      <div class="field">
+        <label for="codAds">ADS Sensitivity Multiplier (0.10 - 2.00)</label>
+        <input type="number" id="codAds" value="1.00" min="0.1" max="2.0" step="0.05" oninput="fromCod()">
+      </div>
+
+      <div class="field">
+        <label for="codCurve">Aim Response Curve Type</label>
+        <select id="codCurve" onchange="fromCod()">
+          <option value="Standard">Standard</option>
+          <option value="Linear">Linear</option>
+          <option value="Dynamic">Dynamic</option>
+        </select>
       </div>
     </div>
 
-    <div class="result-box">
-      <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9;">Matched Sensitivity Pair</div>
-      <div id="conversionResult" class="result-val">CoD 6.0 ≈ THE FINALS 30</div>
+    <!-- THE FINALS Column -->
+    <div class="card">
+      <div class="card-title title-finals">THE FINALS</div>
+      
+      <div class="field">
+        <label for="finalsH">Look Sensitivity Horizontal (1 - 500)</label>
+        <input type="number" id="finalsH" value="200" min="1" max="500" step="1" oninput="fromFinals()">
+      </div>
+
+      <div class="field">
+        <label for="finalsV">Look Sensitivity Vertical (1 - 500)</label>
+        <input type="number" id="finalsV" value="200" min="1" max="500" step="1" oninput="fromFinals()">
+      </div>
+
+      <div class="field">
+        <label for="finalsZoom">Zoom Sensitivity Multiplier (%)</label>
+        <input type="number" id="finalsZoom" value="100" min="1" max="200" step="1" oninput="fromFinals()">
+      </div>
+
+      <div class="field">
+        <label for="finalsCurve">Look Response Curve</label>
+        <select id="finalsCurve" onchange="fromFinals()">
+          <option value="Exponential">Exponential</option>
+          <option value="Linear">Linear</option>
+        </select>
+      </div>
     </div>
   </div>
 
-  <!-- 360 Spin Benchmark Tool -->
-  <div>
-    <div class="section-title">360° Turn Speed Benchmark</div>
-    <div class="card">
-      <div id="status" class="status">Press any button on controller to connect</div>
-      <div id="timer" class="timer">0.00s</div>
-      
-      <p style="font-size: 0.85rem; color: #cbd5e1; margin: 0.5rem 0;">
-        Hold stick <strong>100% Right</strong> in-game. Press <strong>A / Cross</strong> to start, spin 360°, and press <strong>A / Cross</strong> to stop.
-      </p>
-
-      <div class="stats">
-        <div class="stat-box">
-          <span>Last Turn Speed</span>
-          <span id="lastSpeed" class="stat-val">-- deg/s</span>
-        </div>
-        <div class="stat-box">
-          <span>Avg Speed (3 Runs)</span>
-          <span id="avgSpeed" class="stat-val">-- deg/s</span>
-        </div>
-      </div>
-
-      <button class="btn-reset" onclick="resetBenchmark()">Reset Benchmark Runs</button>
-    </div>
+  <!-- Advanced Matching Recommendations -->
+  <div class="recommendation-box">
+    <div class="rec-title">Recommended Look Boost Settings for Parity</div>
+    <ul class="rec-list" id="recList">
+      <li>Set <strong>Horizontal & Vertical Look Boost</strong> to <strong>0</strong> in THE FINALS for steady 1:1 CoD feel.</li>
+      <li>Set <strong>Look Acceleration</strong> to <strong>0%</strong> in THE FINALS.</li>
+    </ul>
   </div>
 </div>
 
 <script>
-  let startTime = null;
-  let timing = false;
-  let lastBtnState = false;
-  let turnHistory = [];
+  // Conversion constant: CoD 6.0 approx equals 200 in THE FINALS base scale
+  const SCALE_FACTOR = 33.333;
 
-  // Gamepad listener
-  window.addEventListener("gamepadconnected", (e) => {
-    document.getElementById("status").innerText = `Connected: ${e.gamepad.id.split('(')[0]}`;
-    requestAnimationFrame(updateLoop);
-  });
+  function fromCod() {
+    const codH = parseFloat(document.getElementById("codH").value) || 1;
+    const codV = parseFloat(document.getElementById("codV").value) || 1;
+    const codAds = parseFloat(document.getElementById("codAds").value) || 1;
+    const codCurve = document.getElementById("codCurve").value;
 
-  function updateLoop() {
-    const gamepads = navigator.getGamepads();
-    if (!gamepads[0]) return requestAnimationFrame(updateLoop);
+    // Base Sens Math
+    document.getElementById("finalsH").value = Math.round(codH * SCALE_FACTOR);
+    document.getElementById("finalsV").value = Math.round(codV * SCALE_FACTOR);
+    
+    // ADS Math
+    document.getElementById("finalsZoom").value = Math.round(codAds * 100);
 
-    const gp = gamepads[0];
-    const actionBtn = gp.buttons[0].pressed; // A or Cross button
-
-    if (actionBtn && !lastBtnState) {
-      if (!timing) {
-        startTime = performance.now();
-        timing = true;
-        document.getElementById("status").innerText = "Timing 360° turn...";
-      } else {
-        const elapsed = (performance.now() - startTime) / 1000;
-        timing = false;
-        
-        const degPerSec = 360 / elapsed;
-        turnHistory.push(degPerSec);
-        if (turnHistory.length > 3) turnHistory.shift(); // Keep last 3 runs
-
-        const avgDegPerSec = turnHistory.reduce((a, b) => a + b, 0) / turnHistory.length;
-
-        document.getElementById("timer").innerText = `${elapsed.toFixed(2)}s`;
-        document.getElementById("lastSpeed").innerText = `${degPerSec.toFixed(1)} deg/s`;
-        document.getElementById("avgSpeed").innerText = `${avgDegPerSec.toFixed(1)} deg/s`;
-        document.getElementById("status").innerText = `Run ${turnHistory.length} Recorded!`;
-      }
-    }
-    lastBtnState = actionBtn;
-
-    if (timing) {
-      const liveElapsed = (performance.now() - startTime) / 1000;
-      document.getElementById("timer").innerText = `${liveElapsed.toFixed(2)}s`;
+    // Curve Math
+    if (codCurve === "Linear") {
+      document.getElementById("finalsCurve").value = "Linear";
+    } else {
+      document.getElementById("finalsCurve").value = "Exponential";
     }
 
-    requestAnimationFrame(updateLoop);
+    updateRecommendations(codCurve);
   }
 
-  function resetBenchmark() {
-    turnHistory = [];
-    document.getElementById("timer").innerText = "0.00s";
-    document.getElementById("lastSpeed").innerText = "-- deg/s";
-    document.getElementById("avgSpeed").innerText = "-- deg/s";
-    document.getElementById("status").innerText = "Benchmark Reset. Press A / Cross to start.";
+  function fromFinals() {
+    const finalsH = parseFloat(document.getElementById("finalsH").value) || 1;
+    const finalsV = parseFloat(document.getElementById("finalsV").value) || 1;
+    const finalsZoom = parseFloat(document.getElementById("finalsZoom").value) || 100;
+    const finalsCurve = document.getElementById("finalsCurve").value;
+
+    // Base Sens Math
+    document.getElementById("codH").value = (finalsH / SCALE_FACTOR).toFixed(1);
+    document.getElementById("codV").value = (finalsV / SCALE_FACTOR).toFixed(1);
+
+    // ADS Math
+    document.getElementById("codAds").value = (finalsZoom / 100).toFixed(2);
+
+    // Curve Math
+    if (finalsCurve === "Linear") {
+      document.getElementById("codCurve").value = "Linear";
+    } else {
+      document.getElementById("codCurve").value = "Standard";
+    }
+
+    updateRecommendations(document.getElementById("codCurve").value);
   }
 
-  // Linear ratio matching functions
-  function convertFromCod() {
-    const codVal = parseFloat(document.getElementById("codSens").value) || 1;
-    const finalsVal = Math.round(codVal * 5);
-    document.getElementById("finalsSens").value = finalsVal;
-    document.getElementById("conversionResult").innerText = `CoD ${codVal.toFixed(1)} ≈ THE FINALS ${finalsVal}`;
+  function updateRecommendations(curveType) {
+    const recList = document.getElementById("recList");
+    if (curveType === "Dynamic") {
+      recList.innerHTML = `
+        <li>For CoD <strong>Dynamic</strong> feel: Set THE FINALS to <strong>Exponential</strong>.</li>
+        <li>Set <strong>Horizontal Look Boost</strong> to ~<strong>30-50</strong> with a <strong>0.2s Ramp-up Time</strong> to mimic Dynamic S-Curve acceleration.</li>
+        <li>Keep <strong>Look Acceleration</strong> at <strong>0%</strong>.</li>
+      `;
+    } else {
+      recList.innerHTML = `
+        <li>Set <strong>Horizontal & Vertical Look Boost</strong> to <strong>0</strong> in THE FINALS for direct 1:1 linear acceleration parity.</li>
+        <li>Set <strong>Look Acceleration</strong> to <strong>0%</strong> in THE FINALS.</li>
+      `;
+    }
   }
 
-  function convertFromFinals() {
-    const finalsVal = parseFloat(document.getElementById("finalsSens").value) || 1;
-    const codVal = (finalsVal / 5).toFixed(1);
-    document.getElementById("codSens").value = codVal;
-    document.getElementById("conversionResult").innerText = `THE FINALS ${finalsVal} ≈ CoD ${codVal}`;
-  }
+  // Initial Sync
+  fromCod();
 </script>
 
 </body>
