@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CoD <-> THE FINALS Controller Converter</title>
+  <title>Universal Controller Sensitivity Converter</title>
   <style>
     * { box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 2rem; display: flex; justify-content: center; }
-    .container { max-width: 800px; width: 100%; background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .container { max-width: 850px; width: 100%; background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     h1 { margin-top: 0; font-size: 1.6rem; text-align: center; color: #38bdf8; }
+    
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
     .card { background: #334155; padding: 1.25rem; border-radius: 8px; }
-    .card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #475569; display: flex; justify-content: space-between; }
-    .title-cod { color: #a3e635; }
-    .title-finals { color: #f43f5e; }
     
+    .game-select { margin-bottom: 1.25rem; }
+    .game-select select { font-weight: bold; font-size: 1.05rem; background: #0f172a; color: #38bdf8; border: 2px solid #0284c7; }
+
     .field { margin-bottom: 1rem; }
     label { display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: #cbd5e1; }
-    input, select { width: 100%; padding: 0.6rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 0.95rem; }
+    input, select { width: 100%; padding: 0.65rem; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 0.95rem; }
     
-    .recommendation-box { background: #0284c7; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; }
-    .rec-title { font-size: 0.85rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em; opacity: 0.9; }
-    .rec-list { margin: 0.5rem 0 0 0; padding-left: 1.2rem; font-size: 0.9rem; line-height: 1.4; }
+    .recommendation-box { background: #0284c7; padding: 1.25rem; border-radius: 8px; margin-top: 1.5rem; }
+    .rec-title { font-size: 0.85rem; text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em; opacity: 0.95; }
+    .rec-list { margin: 0.5rem 0 0 0; padding-left: 1.2rem; font-size: 0.9rem; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -29,146 +30,203 @@
 <div class="container">
   <h1>Controller Sensitivity Converter</h1>
   <p style="text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: -0.5rem;">
-    Bidirectional translation for Call of Duty and THE FINALS
+    Dynamic multi-game look sensitivity & response curve translator
   </p>
 
   <div class="grid">
-    <!-- Call of Duty Column -->
-    <div class="card">
-      <div class="card-title title-cod">Call of Duty</div>
-      
-      <div class="field">
-        <label for="codH">Horizontal Stick Sensitivity (1.0 - 20.0)</label>
-        <input type="number" id="codH" value="6.0" min="1" max="20" step="0.1" oninput="fromCod()">
+    <!-- Left Side -->
+    <div class="card" id="cardA">
+      <div class="field game-select">
+        <label for="selectA">Source Game</label>
+        <select id="selectA" onchange="initCards(); convert(true);"></select>
       </div>
-      
-      <div class="field">
-        <label for="codV">Vertical Stick Sensitivity (1.0 - 20.0)</label>
-        <input type="number" id="codV" value="6.0" min="1" max="20" step="0.1" oninput="fromCod()">
-      </div>
-
-      <div class="field">
-        <label for="codAds">ADS Sensitivity Multiplier (0.10 - 2.00)</label>
-        <input type="number" id="codAds" value="1.00" min="0.1" max="2.0" step="0.05" oninput="fromCod()">
-      </div>
-
-      <div class="field">
-        <label for="codCurve">Aim Response Curve Type</label>
-        <select id="codCurve" onchange="fromCod()">
-          <option value="Standard">Standard</option>
-          <option value="Linear">Linear</option>
-          <option value="Dynamic">Dynamic</option>
-        </select>
-      </div>
+      <div id="inputsA"></div>
     </div>
 
-    <!-- THE FINALS Column -->
-    <div class="card">
-      <div class="card-title title-finals">THE FINALS</div>
-      
-      <div class="field">
-        <label for="finalsH">Look Sensitivity Horizontal (1 - 500)</label>
-        <input type="number" id="finalsH" value="200" min="1" max="500" step="1" oninput="fromFinals()">
+    <!-- Right Side -->
+    <div class="card" id="cardB">
+      <div class="field game-select">
+        <label for="selectB">Target Game</label>
+        <select id="selectB" onchange="initCards(); convert(true);"></select>
       </div>
-
-      <div class="field">
-        <label for="finalsV">Look Sensitivity Vertical (1 - 500)</label>
-        <input type="number" id="finalsV" value="200" min="1" max="500" step="1" oninput="fromFinals()">
-      </div>
-
-      <div class="field">
-        <label for="finalsZoom">Zoom Sensitivity Multiplier (%)</label>
-        <input type="number" id="finalsZoom" value="100" min="1" max="200" step="1" oninput="fromFinals()">
-      </div>
-
-      <div class="field">
-        <label for="finalsCurve">Look Response Curve</label>
-        <select id="finalsCurve" onchange="fromFinals()">
-          <option value="Exponential">Exponential</option>
-          <option value="Linear">Linear</option>
-        </select>
-      </div>
+      <div id="inputsB"></div>
     </div>
   </div>
 
-  <!-- Advanced Matching Recommendations -->
+  <!-- Dynamic Game Recommendations -->
   <div class="recommendation-box">
-    <div class="rec-title">Recommended Look Boost Settings for Parity</div>
-    <ul class="rec-list" id="recList">
-      <li>Set <strong>Horizontal & Vertical Look Boost</strong> to <strong>0</strong> in THE FINALS for steady 1:1 CoD feel.</li>
-      <li>Set <strong>Look Acceleration</strong> to <strong>0%</strong> in THE FINALS.</li>
-    </ul>
+    <div class="rec-title">Curve & Acceleration Parity Tips</div>
+    <ul class="rec-list" id="recList"></ul>
   </div>
 </div>
 
 <script>
-  // Conversion constant: CoD 6.0 approx equals 200 in THE FINALS base scale
-  const SCALE_FACTOR = 33.333;
-
-  function fromCod() {
-    const codH = parseFloat(document.getElementById("codH").value) || 1;
-    const codV = parseFloat(document.getElementById("codV").value) || 1;
-    const codAds = parseFloat(document.getElementById("codAds").value) || 1;
-    const codCurve = document.getElementById("codCurve").value;
-
-    // Base Sens Math
-    document.getElementById("finalsH").value = Math.round(codH * SCALE_FACTOR);
-    document.getElementById("finalsV").value = Math.round(codV * SCALE_FACTOR);
-    
-    // ADS Math
-    document.getElementById("finalsZoom").value = Math.round(codAds * 100);
-
-    // Curve Math
-    if (codCurve === "Linear") {
-      document.getElementById("finalsCurve").value = "Linear";
-    } else {
-      document.getElementById("finalsCurve").value = "Exponential";
+  // Game Configuration Database
+  const GAME_DATA = {
+    cod: {
+      name: "Call of Duty",
+      h: { min: 0.05, max: 4.00, step: 0.05, default: 1.20, label: "Horizontal Stick Sens (0.05 - 4.00)" },
+      v: { min: 0.05, max: 4.00, step: 0.05, default: 1.20, label: "Vertical Stick Sens (0.05 - 4.00)" },
+      zoom: { min: 0.05, max: 4.00, step: 0.05, default: 1.00, label: "ADS Sens Multiplier (0.05 - 4.00)" },
+      curves: ["Standard", "Linear", "Dynamic"],
+      // Scaling baseline factor (1.20 CoD = 200 THE FINALS)
+      scaleFactor: 166.6667
+    },
+    finals: {
+      name: "THE FINALS",
+      h: { min: 0, max: 750, step: 5, default: 200, label: "Look Sens Horizontal (0 - 750)" },
+      v: { min: 0, max: 750, step: 5, default: 200, label: "Look Sens Vertical (0 - 750)" },
+      zoom: { min: 1, max: 200, step: 1, default: 100, label: "Zoom Sens Multiplier (1% - 200%)" },
+      curves: ["Exponential", "Linear", "Sinusoidal"],
+      scaleFactor: 1.0
     }
+  };
 
-    updateRecommendations(codCurve);
+  // Populate Dropdowns
+  function populateSelects() {
+    const selA = document.getElementById("selectA");
+    const selB = document.getElementById("selectB");
+    selA.innerHTML = "";
+    selB.innerHTML = "";
+
+    Object.keys(GAME_DATA).forEach(key => {
+      const optA = document.createElement("option");
+      optA.value = key;
+      optA.innerText = GAME_DATA[key].name;
+      selA.appendChild(optA);
+
+      const optB = document.createElement("option");
+      optB.value = key;
+      optB.innerText = GAME_DATA[key].name;
+      selB.appendChild(optB);
+    });
+
+    selA.value = "cod";
+    selB.value = "finals";
   }
 
-  function fromFinals() {
-    const finalsH = parseFloat(document.getElementById("finalsH").value) || 1;
-    const finalsV = parseFloat(document.getElementById("finalsV").value) || 1;
-    const finalsZoom = parseFloat(document.getElementById("finalsZoom").value) || 100;
-    const finalsCurve = document.getElementById("finalsCurve").value;
+  // Render Card UI based on selected game
+  function renderCardUI(side) {
+    const gameKey = document.getElementById(`select${side}`).value;
+    const g = GAME_DATA[gameKey];
+    const container = document.getElementById(`inputs${side}`);
 
-    // Base Sens Math
-    document.getElementById("codH").value = (finalsH / SCALE_FACTOR).toFixed(1);
-    document.getElementById("codV").value = (finalsV / SCALE_FACTOR).toFixed(1);
-
-    // ADS Math
-    document.getElementById("codAds").value = (finalsZoom / 100).toFixed(2);
-
-    // Curve Math
-    if (finalsCurve === "Linear") {
-      document.getElementById("codCurve").value = "Linear";
-    } else {
-      document.getElementById("codCurve").value = "Standard";
-    }
-
-    updateRecommendations(document.getElementById("codCurve").value);
+    container.innerHTML = `
+      <div class="field">
+        <label for="h_${side}">${g.h.label}</label>
+        <input type="number" id="h_${side}" min="${g.h.min}" max="${g.h.max}" step="${g.h.step}" value="${g.h.default}" oninput="convert(${side === 'A'})">
+      </div>
+      <div class="field">
+        <label for="v_${side}">${g.v.label}</label>
+        <input type="number" id="v_${side}" min="${g.v.min}" max="${g.v.max}" step="${g.v.step}" value="${g.v.default}" oninput="convert(${side === 'A'})">
+      </div>
+      <div class="field">
+        <label for="zoom_${side}">${g.zoom.label}</label>
+        <input type="number" id="zoom_${side}" min="${g.zoom.min}" max="${g.zoom.max}" step="${g.zoom.step}" value="${g.zoom.default}" oninput="convert(${side === 'A'})">
+      </div>
+      <div class="field">
+        <label for="curve_${side}">Look Response Curve</label>
+        <select id="curve_${side}" onchange="convert(${side === 'A'})">
+          ${g.curves.map(c => `<option value="${c}">${c}</option>`).join('')}
+        </select>
+      </div>
+    `;
   }
 
-  function updateRecommendations(curveType) {
+  function initCards() {
+    renderCardUI('A');
+    renderCardUI('B');
+  }
+
+  // Helper function to step-align rounding
+  function clampStep(val, min, max, step) {
+    let clamped = Math.max(min, Math.min(max, val));
+    let stepped = Math.round(clamped / step) * step;
+    return parseFloat(stepped.toFixed(2));
+  }
+
+  // Conversion Engine
+  function convert(fromLeft) {
+    const srcSide = fromLeft ? 'A' : 'B';
+    const tgtSide = fromLeft ? 'B' : 'A';
+
+    const srcKey = document.getElementById(`select${srcSide}`).value;
+    const tgtKey = document.getElementById(`select${tgtSide}`).value;
+
+    const srcH = parseFloat(document.getElementById(`h_${srcSide}`).value) || 0;
+    const srcV = parseFloat(document.getElementById(`v_${srcSide}`).value) || 0;
+    const srcZoom = parseFloat(document.getElementById(`zoom_${srcSide}`).value) || 0;
+    const srcCurve = document.getElementById(`curve_${srcSide}`).value;
+
+    const srcG = GAME_DATA[srcKey];
+    const tgtG = GAME_DATA[tgtKey];
+
+    if (srcKey === tgtKey) {
+      // Direct 1:1 copy if same game is selected on both sides
+      document.getElementById(`h_${tgtSide}`).value = srcH;
+      document.getElementById(`v_${tgtSide}`).value = srcV;
+      document.getElementById(`zoom_${tgtSide}`).value = srcZoom;
+      document.getElementById(`curve_${tgtSide}`).value = srcCurve;
+      updateTips(srcKey, tgtKey, srcCurve, srcCurve);
+      return;
+    }
+
+    let tgtH, tgtV, tgtZoom, tgtCurve;
+
+    if (srcKey === "cod" && tgtKey === "finals") {
+      tgtH = clampStep(srcH * srcG.scaleFactor, tgtG.h.min, tgtG.h.max, tgtG.h.step);
+      tgtV = clampStep(srcV * srcG.scaleFactor, tgtG.v.min, tgtG.v.max, tgtG.v.step);
+      tgtZoom = clampStep(srcZoom * 100, tgtG.zoom.min, tgtG.zoom.max, tgtG.zoom.step);
+      
+      if (srcCurve === "Linear") tgtCurve = "Linear";
+      else if (srcCurve === "Dynamic") tgtCurve = "Sinusoidal";
+      else tgtCurve = "Exponential";
+
+    } else if (srcKey === "finals" && tgtKey === "cod") {
+      tgtH = clampStep(srcH / GAME_DATA.cod.scaleFactor, tgtG.h.min, tgtG.h.max, tgtG.h.step);
+      tgtV = clampStep(srcV / GAME_DATA.cod.scaleFactor, tgtG.v.min, tgtG.v.max, tgtG.v.step);
+      tgtZoom = clampStep(srcZoom / 100, tgtG.zoom.min, tgtG.zoom.max, tgtG.zoom.step);
+      
+      if (srcCurve === "Linear") tgtCurve = "Linear";
+      else if (srcCurve === "Sinusoidal") tgtCurve = "Dynamic";
+      else tgtCurve = "Standard";
+    }
+
+    document.getElementById(`h_${tgtSide}`).value = tgtH;
+    document.getElementById(`v_${tgtSide}`).value = tgtV;
+    document.getElementById(`zoom_${tgtSide}`).value = tgtZoom;
+    document.getElementById(`curve_${tgtSide}`).value = tgtCurve;
+
+    const codCurveVal = srcKey === "cod" ? srcCurve : tgtCurve;
+    const finalsCurveVal = srcKey === "finals" ? srcCurve : tgtCurve;
+    updateTips(srcKey, tgtKey, codCurveVal, finalsCurveVal);
+  }
+
+  function updateTips(srcKey, tgtKey, codCurve, finalsCurve) {
     const recList = document.getElementById("recList");
-    if (curveType === "Dynamic") {
+    
+    if (codCurve === "Dynamic" || finalsCurve === "Sinusoidal") {
       recList.innerHTML = `
-        <li>For CoD <strong>Dynamic</strong> feel: Set THE FINALS to <strong>Exponential</strong>.</li>
-        <li>Set <strong>Horizontal Look Boost</strong> to ~<strong>30-50</strong> with a <strong>0.2s Ramp-up Time</strong> to mimic Dynamic S-Curve acceleration.</li>
-        <li>Keep <strong>Look Acceleration</strong> at <strong>0%</strong>.</li>
+        <li><strong>Dynamic <-> Sinusoidal:</strong> Both curves utilize S-curve acceleration. This is the closest native response match between CoD and THE FINALS.</li>
+        <li>Set <strong>Horizontal & Vertical Look Boost</strong> to <strong>0</strong> and <strong>Look Acceleration</strong> to <strong>0%</strong> in THE FINALS for exact curve tracking.</li>
+      `;
+    } else if (codCurve === "Linear" || finalsCurve === "Linear") {
+      recList.innerHTML = `
+        <li><strong>Linear <-> Linear:</strong> Pure 1:1 raw stick deflection with no artificial acceleration curve.</li>
+        <li>Ensure <strong>Look Acceleration</strong> is set to <strong>0%</strong> in THE FINALS.</li>
       `;
     } else {
       recList.innerHTML = `
-        <li>Set <strong>Horizontal & Vertical Look Boost</strong> to <strong>0</strong> in THE FINALS for direct 1:1 linear acceleration parity.</li>
-        <li>Set <strong>Look Acceleration</strong> to <strong>0%</strong> in THE FINALS.</li>
+        <li><strong>Standard <-> Exponential:</strong> Maps default power-curve response scaling across both games.</li>
+        <li>Keep <strong>Look Boost</strong> settings at <strong>0</strong> in THE FINALS to preserve consistent velocity scaling.</li>
       `;
     }
   }
 
-  // Initial Sync
-  fromCod();
+  // Initialize
+  populateSelects();
+  initCards();
+  convert(true);
 </script>
 
 </body>
