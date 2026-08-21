@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Controller Sens Benchmarker</title>
+  <style>
+    body { font-family: sans-serif; background: #121212; color: #fff; text-align: center; padding: 2rem; }
+    .card { background: #1e1e1e; padding: 2rem; border-radius: 8px; display: inline-block; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Controller Benchmark</h2>
+    <p id="status">Press any button on your controller to connect.</p>
+    <h3 id="timer">Time: 0.00s</h3>
+    <p id="result">Velocity: -- deg/sec</p>
+    <p><small>Hold stick 100% Right. Press <strong>A / Cross</strong> to start/stop $360^\circ$ timer.</small></p>
+  </div>
+
+  <script>
+    let startTime = null;
+    let timing = false;
+    let lastBtnState = false;
+
+    window.addEventListener("gamepadconnected", (e) => {
+      document.getElementById("status").innerText = `Connected: ${e.gamepad.id}`;
+      requestAnimationFrame(updateLoop);
+    });
+
+    function updateLoop() {
+      const gamepads = navigator.getGamepads();
+      if (!gamepads[0]) return requestAnimationFrame(updateLoop);
+
+      const gp = gamepads[0];
+      const actionBtn = gp.buttons[0].pressed; // A / Cross button
+
+      // Trigger timer on button press edge
+      if (actionBtn && !lastBtnState) {
+        if (!timing) {
+          startTime = performance.now();
+          timing = true;
+          document.getElementById("status").innerText = "Timing $360^\circ$ turn...";
+        } else {
+          const elapsed = (performance.now() - startTime) / 1000;
+          timing = false;
+          const degPerSec = 360 / elapsed;
+          document.getElementById("timer").innerText = `Time: ${elapsed.toFixed(2)}s`;
+          document.getElementById("result").innerText = `Max Velocity: ${degPerSec.toFixed(1)} deg/sec`;
+          document.getElementById("status").innerText = "Benchmark complete!";
+        }
+      }
+      lastBtnState = actionBtn;
+
+      if (timing) {
+        const liveElapsed = (performance.now() - startTime) / 1000;
+        document.getElementById("timer").innerText = `Time: ${liveElapsed.toFixed(2)}s`;
+      }
+
+      requestAnimationFrame(updateLoop);
+    }
+  </script>
+</body>
+</html>
